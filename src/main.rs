@@ -5,7 +5,7 @@ mod scores;
 fn main() {
     let args: Vec<String> = env::args().skip(1).collect();
 
-    // Take each pair of input, answer and score them
+    // Take each pair of guess, answer and score them
 
     if args.len() % 2 == 0 {
         for i in 0..(args.len() / 2) {
