@@ -87,7 +87,7 @@ impl fmt::Display for Scored {
 
         write!(
             f,
-            "{{{}, {}, {}, {}, {}}}",
+            "{{{}, {}, g={}, a={}, {}}}",
             if self.valid { VALID } else { INVALID },
             if self.done { "✅" } else { "❌" },
             self.guess,

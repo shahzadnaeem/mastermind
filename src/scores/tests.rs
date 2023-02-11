@@ -1,5 +1,3 @@
-use std::num;
-
 use quickcheck::TestResult;
 use rand;
 
@@ -43,14 +41,14 @@ fn create_invalid_scored() {
     assert_eq!(scored.done, false);
 }
 
-fn check(guess: &str, answer: &str, valid: bool, done: bool, scores: Vec<Score>) -> bool {
+fn check(guess: &str, answer: &str, valid: bool, done: bool, scores: &Vec<Score>) -> bool {
     let scored = scores::Scored::new(guess, answer);
 
     println!("Checking: {}", scored);
 
     assert_eq!(valid, scored.valid);
     assert_eq!(done, scored.done);
-    assert_eq!(scores, scored.scores);
+    assert_eq!(scores, &scored.scores);
 
     true
 }
@@ -65,7 +63,7 @@ fn winning_tests() {
             word,
             true,
             true,
-            vec![Score::Here; word.chars().count()],
+            &vec![Score::Here; word.chars().count()],
         );
     }
 }
@@ -97,7 +95,7 @@ fn totally_wrong_tests() {
             &random_word_excluding(word),
             true,
             false,
-            vec![Score::Nope; word.chars().count()],
+            &vec![Score::Nope; word.chars().count()],
         );
     }
 }
@@ -119,7 +117,7 @@ fn half_right_tests() {
         let mut expected_scores = vec![Score::Here; num_chars / 2];
         expected_scores.append(&mut vec![Score::Nope; num_chars / 2]);
 
-        check(&half_right_word, &word, true, false, expected_scores);
+        check(&half_right_word, &word, true, false, &expected_scores);
     }
 }
 
@@ -134,7 +132,7 @@ fn qc_winning_tests(word: String) -> TestResult {
         &word,
         true,
         true,
-        vec![Score::Here; word.chars().count()],
+        &vec![Score::Here; word.chars().count()],
     ))
 }
 
@@ -149,7 +147,7 @@ fn qc_totally_wrong_tests(word: String) -> TestResult {
         &random_word_excluding(&word),
         true,
         false,
-        vec![Score::Nope; word.chars().count()],
+        &vec![Score::Nope; word.chars().count()],
     ))
 }
 
@@ -157,7 +155,7 @@ fn qc_totally_wrong_tests(word: String) -> TestResult {
 fn qc_half_right_tests(word: String) -> TestResult {
     let num_chars = word.chars().count();
 
-    if num_chars == 0 || word.contains('\0') || num_chars % 2 != 0 {
+    if num_chars == 0 || word.contains('\0') {
         return TestResult::discard();
     }
 
@@ -169,7 +167,17 @@ fn qc_half_right_tests(word: String) -> TestResult {
     let half_right_word: String = first_half_chars + &second_half_chars;
 
     let mut expected_scores = vec![Score::Here; num_chars / 2];
-    expected_scores.append(&mut vec![Score::Nope; num_chars / 2]);
+    expected_scores.append(&mut vec![Score::Nope; num_chars / 2 + num_chars % 2]);
 
-    TestResult::from_bool(check(&half_right_word, &word, true, false, expected_scores))
+    check(&half_right_word, &word, true, false, &expected_scores);
+
+    expected_scores.reverse();
+
+    TestResult::from_bool(check(
+        &half_right_word.chars().rev().collect::<String>(),
+        &word.chars().rev().collect::<String>(),
+        true,
+        false,
+        &expected_scores,
+    ))
 }
