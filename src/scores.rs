@@ -33,7 +33,7 @@ fn calc_scores(input: &str, answer: &str, scores: &mut Vec<Score>) -> bool {
 
     // First pass - chars in correct place
     for (i, c) in input.char_indices() {
-        if c == ans[i] {
+        if c.to_ascii_lowercase() == ans[i].to_ascii_lowercase() {
             scores[i] = Score::Here;
             ans[i] = USED_CHAR;
         }
@@ -41,7 +41,10 @@ fn calc_scores(input: &str, answer: &str, scores: &mut Vec<Score>) -> bool {
 
     for (i, c) in input.char_indices() {
         if scores[i] == Score::Nope {
-            if let Some(pos) = ans.iter().position(|&v| v == c) {
+            if let Some(pos) = ans
+                .iter()
+                .position(|&v| v.to_ascii_lowercase() == c.to_ascii_lowercase())
+            {
                 scores[i] = Score::Somewhere;
                 ans[pos] = USED_CHAR;
             }
