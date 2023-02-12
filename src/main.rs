@@ -32,16 +32,20 @@ fn main() {
         let idx = rng.gen_range(0..num_words);
         let answer = &words[idx];
 
+        let mut coloured_guess = String::from(".....");
+
         loop {
-            print!("Please enter your guess: ");
+            print!("Guess {}: ", coloured_guess);
             if let Ok(_) = io::stdout().flush() {
                 let mut guess = String::new();
                 if let Ok(_) = io::stdin().read_line(&mut guess) {
                     let scored = scores::Scored::new(&guess[..guess.len() - 1], &answer);
 
-                    println!("Guess: {} {}", scored.guess, scored.score_result());
+                    coloured_guess = scored.coloured_guess();
 
                     if scored.done {
+                        print!("\nSuccess!: {}\n", coloured_guess);
+
                         break;
                     }
                 }

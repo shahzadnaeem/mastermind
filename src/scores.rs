@@ -1,5 +1,7 @@
 use std::fmt;
 
+use owo_colors::OwoColorize;
+
 pub const VALID: &str = "VALID";
 pub const INVALID: &str = "INVALID";
 
@@ -82,6 +84,26 @@ impl Scored {
 
     pub fn score_result(&self) -> String {
         self.scores.iter().map(|s| s.to_char()).collect::<String>()
+    }
+
+    pub fn coloured_guess(&self) -> String {
+        let mut answer = String::new();
+
+        for (c, s) in self
+            .guess
+            .to_uppercase()
+            .to_string()
+            .chars()
+            .zip(self.scores.iter())
+        {
+            match s {
+                Score::Here => answer.push_str(&format!("{}", c.green())),
+                Score::Somewhere => answer.push_str(&format!("{}", c.yellow())),
+                Score::Nope => answer.push_str(&format!("{}", c.black())),
+            }
+        }
+
+        answer
     }
 }
 
