@@ -79,11 +79,15 @@ impl Scored {
             scores,
         }
     }
+
+    pub fn score_result(&self) -> String {
+        self.scores.iter().map(|s| s.to_char()).collect::<String>()
+    }
 }
 
 impl fmt::Display for Scored {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let scores = self.scores.iter().map(|s| s.to_char()).collect::<String>();
+        let scores = self.score_result();
 
         write!(
             f,
