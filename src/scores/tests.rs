@@ -121,6 +121,49 @@ fn half_right_tests() {
     }
 }
 
+struct Scenario {
+    guess: String,
+    answer: String,
+    expected: Vec<Score>,
+}
+
+impl Scenario {
+    pub fn new(guess: &str, answer: &str, expected: Vec<Score>) -> Self {
+        Scenario {
+            guess: String::from(guess),
+            answer: String::from(answer),
+            expected,
+        }
+    }
+}
+
+macro_rules! to_expected {
+    (H) => {Score::Here};
+    (S) => {Score::Somewhere};
+    (N) => {Score::Nope};
+    ($($c:tt)+) => {vec![
+        $(to_expected!($c)),+
+    ]}
+}
+
+#[test]
+fn other_scenarios() {
+    let tricky = vec![
+        Scenario::new("cacca", "acccc", to_expected![S S H H N]),
+        Scenario::new("aabbb", "acccc", to_expected![H N N N N]),
+        Scenario::new("baabb", "acccc", to_expected![N S N N N]),
+        Scenario::new("bbaab", "acccc", to_expected![N N S N N]),
+        Scenario::new("bbbaa", "acccc", to_expected![N N N S N]),
+        Scenario::new("bbbba", "acccc", to_expected![N N N N S]),
+        Scenario::new("bbbbc", "acccc", to_expected![N N N N H]),
+        Scenario::new("abcde", "bcdea", to_expected![S S S S S]),
+    ];
+
+    tricky.iter().for_each(|sc| {
+        check(&sc.guess, &sc.answer, true, false, &sc.expected);
+    });
+}
+
 #[quickcheck]
 fn qc_winning_tests(word: String) -> TestResult {
     if word.len() == 0 || word.contains('\0') {

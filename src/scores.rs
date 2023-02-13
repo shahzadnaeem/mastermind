@@ -36,19 +36,20 @@ impl Score {
 fn calc_scores(guess: &str, answer: &str, scores: &mut Vec<Score>) -> bool {
     let mut ans: Vec<char> = answer.chars().collect();
 
-    // First pass - chars in correct place
+    // First pass - chars in correct place => Score::Here
     for (i, c) in guess.chars().enumerate() {
-        if c.to_lowercase().to_string() == ans[i].to_lowercase().to_string() {
+        if c.to_ascii_lowercase() == ans[i].to_ascii_lowercase() {
             scores[i] = Score::Here;
             ans[i] = USED_CHAR;
         }
     }
 
+    // Second pass - chars in incorrect place => Score::Somewhere
     for (i, c) in guess.chars().enumerate() {
         if scores[i] == Score::Nope {
             if let Some(pos) = ans
                 .iter()
-                .position(|&v| v.to_lowercase().to_string() == c.to_lowercase().to_string())
+                .position(|&v| v.to_ascii_lowercase() == c.to_ascii_lowercase())
             {
                 scores[i] = Score::Somewhere;
                 ans[pos] = USED_CHAR;
@@ -113,11 +114,12 @@ impl fmt::Display for Scored {
 
         write!(
             f,
-            "{{{}, {}, g={}, a={}, {}}}",
+            "{{{}, {}, g={}, a={}, {} {}}}",
             if self.valid { VALID } else { INVALID },
             if self.done { "✅" } else { "❌" },
             self.guess,
             self.answer,
+            self.coloured_guess(),
             scores,
         )
     }

@@ -14,7 +14,7 @@ fn main() {
 
     // Take each pair of guess, answer and score them
 
-    if args.len() % 2 == 0 {
+    if args.len() > 0 && args.len() % 2 == 0 {
         for i in 0..(args.len() / 2) {
             let scored = scores::Scored::new(&args[i * 2], &args[i * 2 + 1]);
 
@@ -22,17 +22,24 @@ fn main() {
         }
     }
 
-    if args.len() == 0 {
-        println!("\nLet's play! - I've picked a word...");
+    if args.len() == 0 || args.len() == 1 {
+        let answer = if args.len() == 0 {
+            println!("\nLet's play!");
 
-        let words: Vec<_> = WORDS.lines().collect();
-        let num_words = words.len();
-        let mut rng = rand::thread_rng();
+            let words: Vec<_> = WORDS.lines().collect();
+            let num_words = words.len();
+            let mut rng = rand::thread_rng();
 
-        let idx = rng.gen_range(0..num_words);
-        let answer = &words[idx];
+            let idx = rng.gen_range(0..num_words);
 
-        let mut coloured_guess = String::from(".....");
+            words[idx]
+        } else {
+            &args[0]
+        };
+
+        let l: usize = answer.len();
+
+        let mut coloured_guess = String::from("-".repeat(l));
 
         loop {
             print!("Guess {}: ", coloured_guess);
